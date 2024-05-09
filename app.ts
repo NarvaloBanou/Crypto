@@ -1,10 +1,9 @@
 const express = require("express");
 const axios = require("axios");
-const WebSocket = require("ws");
-
+const webSocket = require("ws"); // webSocket and not WebSocket because of a conflict with the library from TypeScript
 const app = express();
 const server = require("http").createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new webSocket.Server({ server });
 const port = 3000;
 
 // Function retrieving the history of the last 100 transactions of a cryptocurrency pair
@@ -23,11 +22,12 @@ wss.on("connection", (ws) => {
     console.log("Client connected");
     
     // Send initial delta value to client
-    ws.send(JSON.stringify({ delta: "Waiting for connection.." }));
-    let delta = 0;
+    ws.send(JSON.stringify({ delta: "Waiting for" }));
+    
     
     // Periodically update delta and send it to client
     setInterval(async () => {
+        let delta = 0;
         const cryptoPair = 'BTC-USDT';
         const transactions = await getTransactions(cryptoPair);
         const filteredTransactions = transactions.map(transaction => {
