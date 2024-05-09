@@ -18,12 +18,19 @@ app.get('/', async (req, res) => {
     // Retrieve transaction data for the given pair (ex: BTC-USDT)
     const cryptoPair = 'BTC-USDT';
     const transactions = await getTransactions(cryptoPair);
-
-    // return transactions using JSON
-    res.json(transactions);
+    
+    // Filter and map transactions to only include 'sequence' and 'side'
+    const filteredTransactions = transactions.map(transaction => {
+        return {
+            sequence: transaction.sequence,
+            side: transaction.side
+        };
+    });
+    
+    // Return filtered transactions using JSON
+    res.json(filteredTransactions);
 });
 
 app.listen(port, () => {
     console.log(`Server launched on port: ${port}`);
 });
-
