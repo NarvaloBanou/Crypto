@@ -23,14 +23,29 @@ app.get('/', async (req, res) => {
     const filteredTransactions = transactions.map(transaction => {
         return {
             sequence: transaction.sequence,
-            side: transaction.side
+            side: transaction.side,
+            size: parseFloat(transaction.size), //transaction.size is a "String" and we need a Float.
         };
     });
+    // Initialize delta for buy and sell transactions
+    let delta = 0;
+    //console.log(typeof(transactions.size));
+
+    // Loop through filtered transactions and update delta
+    filteredTransactions.forEach(transaction => {
+        if (transaction.side === 'buy') {
+            delta += transaction.size;
+        } else if (transaction.side === 'sell') {
+            delta -= transaction.size;
+        }
+    });
     
-    // Return filtered transactions using JSON
-    res.json(filteredTransactions);
+    res.json({ filteredTransactions, 
+        delta
+    });
 });
 
 app.listen(port, () => {
     console.log(`Server launched on port: ${port}`);
+    
 });
