@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <!-- Div pour afficher le delta -->
+    <div id="deltaDisplay"></div>
+    
+    <!-- Liste pour afficher les transactions -->
+    <div id="filteredTransactions"></div>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:3000");
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            // Mettre à jour le contenu du div avec le delta
+            document.getElementById("deltaDisplay").innerText = "Delta: " + data.delta;
+
+            // Générer une chaîne de caractères pour les transactions
+            let transactionsHTML = "";
+            data.filteredTransactions.forEach(transaction => {
+                transactionsHTML += `<${transaction.sequence} - ${transaction.side} > `;
+            });
+
+            // Afficher les transactions dans l'élément <ul>
+            document.getElementById("filteredTransactions").innerHTML = transactionsHTML;
+        };
+    </script>
+</body>
+</html>
