@@ -6,6 +6,9 @@ const server = require("http").createServer(app);
 const wss = new webSocket.Server({ server });
 const port = 3000;
 
+// Ensemble pour stocker les ID des transactions déjà traitées
+const processedTransactions = new Set();
+let delta = 0;
 // Function retrieving the history of the last 100 transactions of a cryptocurrency pair
 async function getTransactions(cryptoPair) {
     try {
@@ -23,11 +26,9 @@ wss.on("connection", (ws) => {
     
     // Send initial delta value to client
     ws.send(JSON.stringify({ delta: "Waiting for" }));
-    
-    
     // Periodically update delta and send it to client
     setInterval(async () => {
-        let delta = 0;
+        
         const cryptoPair = 'BTC-USDT';
         const transactions = await getTransactions(cryptoPair);
         const filteredTransactions = transactions.map(transaction => {
@@ -37,17 +38,21 @@ wss.on("connection", (ws) => {
                 size: parseFloat(transaction.size), //transaction.size is a "String" and we need a Float.
             };
         });
-
+    
         transactions.forEach(transaction => {
-            if (transaction.side === 'buy') {
-                delta += parseFloat(transaction.size);
-            } else if (transaction.side === 'sell') {
-                delta -= parseFloat(transaction.size);
+            if (!processedTransactions.has(transaction.sequence)) {
+                if (transaction.side === 'buy') {
+                    delta += parseFloat(transaction.size);
+                } else if (transaction.side === 'sell') {
+                    delta -= parseFloat(transaction.size);
+                }
+                processedTransactions.add(transaction.sequence);
+                console.log("has been added")
             }
         });
-
+        console.log("_____________________________________________________________")
         ws.send(JSON.stringify({ filteredTransactions ,delta }));
-    }, 1000); // Update delta every 1 seconds
+    }, 3000); // Update delta every 20 seconds
 });
 
 // HTTP route handler
