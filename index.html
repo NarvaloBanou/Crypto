@@ -3,31 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Test</title>
+    <title>FlowDesk Crypto Platform</title>
+    <link rel="stylesheet" type="text/css" href="/style/style.css">
 </head>
 <body>
-    <!-- Div pour afficher le delta -->
-    <div id="deltaDisplay"></div>
-    
-    <!-- Liste pour afficher les transactions -->
-    <div id="filteredTransactions"></div>
+    <!-- List to choose a specific trading pair -->
+    <label for="cryptoPair">Choose a specific trading pair : </label>
+    <select id="cryptoPair">
+        <option value="BTC-USDT">BTC-USDT</option>
+        <option value="ATOM-USDT">ATOM-USDT</option>
+        <option value="KCS-USDT">KCS-USDT</option>
 
+    </select>
+    <div id="deltaDisplay"> </div>
+    <div id="priceDisplay"> </div>
     <script>
+        
         const ws = new WebSocket("ws://localhost:3000");
 
+        // Function to send the selected cryptocurrency pair to the server
+        function sendCryptoPair() {
+            const cryptoPair = document.getElementById("cryptoPair").value;
+            ws.send(JSON.stringify({ cryptoPair }));
+        }
+
+        // Call the sendCryptoPair function when the selection changes
+        document.getElementById("cryptoPair").addEventListener("change", sendCryptoPair);
+
+        // Event listener for WebSocket messages
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            // Mettre à jour le contenu du div avec le delta
-            document.getElementById("deltaDisplay").innerText = "Delta: " + data.delta;
-
-            // Générer une chaîne de caractères pour les transactions
-            let transactionsHTML = "";
-            data.filteredTransactions.forEach(transaction => {
-                transactionsHTML += `<${transaction.sequence} - ${transaction.side} > `;
-            });
-
-            // Afficher les transactions dans l'élément <ul>
-            document.getElementById("filteredTransactions").innerHTML = transactionsHTML;
+            // Update the content of the delta display div
+            document.getElementById("deltaDisplay").innerText = `Delta ${data.cryptoPair} : ${data.delta}`;
+            // Update the content of the price display div
+            document.getElementById("priceDisplay").innerText = `Price of ${data.cryptoPair} : ${data.cryptoPrice}`;
         };
     </script>
 </body>
