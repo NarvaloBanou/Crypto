@@ -1,0 +1,34 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    line-height: 1.6;
+}
+
+h3 {
+    margin-left: 40px;
+}
+/* delete the point before the sentence */
+ul {
+    list-style-type: none;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+a {
+    color: #007bff;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+/* Looked in the inspect page but dont work*/
+div#json-response.json-response { 
+    font-size: 18px;
+    padding: 10px;
+    background-color: #fff;
+    margin-top: 20px;
+}
